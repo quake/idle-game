@@ -24,6 +24,10 @@ const state = {
   mineCount: 0,
   mineCost: 50,
   mineProduction: 2, // gold per second per mine
+  // Special Events
+  windfallCooldown: 0,       // seconds remaining until windfall is available again
+  freeUpgradesActive: false, // whether the "something for nothing" buff is active
+  freeUpgradesTimer: 0,      // seconds remaining for free upgrades buff
 };
 
 // --- DOM Elements ---
@@ -50,6 +54,12 @@ const autoClickerStatusEl = document.getElementById('auto-clicker-status');
 const buildMineBtn = document.getElementById('build-mine');
 const mineCountEl = document.getElementById('mine-count');
 const mineCostEl = document.getElementById('mine-cost');
+
+// Special Events
+const windfallBtn = document.getElementById('btn-windfall');
+const windfallStatusEl = document.getElementById('windfall-status');
+const freeUpgradesBtn = document.getElementById('btn-free-upgrades');
+const freeUpgradesStatusEl = document.getElementById('free-upgrades-status');
 
 // --- Save / Load ---
 function save() {
@@ -96,6 +106,33 @@ function render() {
   mineCountEl.textContent = state.mineCount;
   mineCostEl.textContent = state.mineCost;
   buildMineBtn.disabled = state.gold < state.mineCost;
+
+  // Windfall button (5-minute cooldown = 300 seconds)
+  if (state.windfallCooldown > 0) {
+    windfallBtn.disabled = true;
+    const mins = Math.floor(state.windfallCooldown / 60);
+    const secs = state.windfallCooldown % 60;
+    windfallStatusEl.textContent = `Cooldown: ${mins}m ${secs}s`;
+  } else {
+    windfallBtn.disabled = false;
+    const bonus = Math.max(state.goldPerSecond * 100, 50);
+    windfallStatusEl.textContent = `Gives +${bonus} gold instantly!`;
+  }
+
+  // Free Upgrades buff button (available when buff is not active)
+  if (state.freeUpgradesActive) {
+    freeUpgradesBtn.disabled = true;
+    freeUpgradesStatusEl.textContent = `⏳ Active: ${state.freeUpgradesTimer}s remaining`;
+  } else {
+    // Cooldown after use: 10 minutes (tracked via freeUpgradesTimer < 0)
+    if (state.freeUpgradesTimer < 0) {
+      freeUpgradesBtn.disabled = true;
+      freeUpgradesStatusEl.textContent = `Cooldown: ${Math.abs(state.freeUpgradesTimer)}s`;
+    } else {
+      freeUpgradesBtn.disabled = false;
+      freeUpgradesStatusEl.textContent = 'All upgrades 90% off for 60s!';
+    }
+  }
 }
 
 // --- Game Loop (1-second tick) ---
@@ -109,6 +146,30 @@ function tick() {
   }
   // Mines produce gold
   state.gold += state.mineCount * state.mineProduction;
+
+  // Countdown windfall cooldown
+  if (state.windfallCooldown > 0) {
+    state.windfallCooldown -= 1;
+  }
+
+  // Countdown free upgrades buff or its post-use cooldown
+  if (state.freeUpgradesActive) {
+    state.freeUpgradesTimer -= 1;
+    if (state.freeUpgradesTimer <= 0) {
+      // Buff expired — restore real upgrade costs and start post-cooldown
+      state.freeUpgradesActive = false;
+      state.goldUpgradeCost = Math.floor(10 * Math.pow(1.5, state.goldUpgradeLevel));
+      state.diamondsUpgradeCost = Math.floor(50 * Math.pow(1.6, state.diamondsUpgradeLevel));
+      state.woodUpgradeCost = Math.floor(30 * Math.pow(1.5, state.woodUpgradeLevel));
+      state.freeUpgradesTimer = -600; // 10-minute cooldown after use
+      document.getElementById('upgrades').classList.remove('free-upgrades-active');
+      logMessage('✅ Free upgrades buff expired! Costs restored.');
+    }
+  } else if (state.freeUpgradesTimer < 0) {
+    // Post-use cooldown countdown
+    state.freeUpgradesTimer += 1;
+  }
+
   render();
   save();
 }
@@ -138,7 +199,13 @@ upgradeGoldBtn.addEventListener('click', () => {
     state.gold -= state.goldUpgradeCost;
     state.goldPerSecond += 1;
     state.goldUpgradeLevel += 1;
-    state.goldUpgradeCost = Math.floor(10 * Math.pow(1.5, state.goldUpgradeLevel));
+    // Only recalculate cost at full price if free upgrades buff is not active
+    if (!state.freeUpgradesActive) {
+      state.goldUpgradeCost = Math.floor(10 * Math.pow(1.5, state.goldUpgradeLevel));
+    } else {
+      // Keep discounted cost during buff
+      state.goldUpgradeCost = Math.max(1, Math.floor(10 * Math.pow(1.5, state.goldUpgradeLevel) * 0.1));
+    }
     render();
     save();
   }
@@ -149,7 +216,11 @@ upgradeDiamondsBtn.addEventListener('click', () => {
     state.gold -= state.diamondsUpgradeCost;
     state.diamondsPerSecond += 0.1; // Diamonds are rarer
     state.diamondsUpgradeLevel += 1;
-    state.diamondsUpgradeCost = Math.floor(50 * Math.pow(1.6, state.diamondsUpgradeLevel));
+    if (!state.freeUpgradesActive) {
+      state.diamondsUpgradeCost = Math.floor(50 * Math.pow(1.6, state.diamondsUpgradeLevel));
+    } else {
+      state.diamondsUpgradeCost = Math.max(1, Math.floor(50 * Math.pow(1.6, state.diamondsUpgradeLevel) * 0.1));
+    }
     render();
     save();
   }
@@ -160,7 +231,11 @@ upgradeWoodBtn.addEventListener('click', () => {
     state.gold -= state.woodUpgradeCost;
     state.woodPerSecond += 2; // Wood is more abundant
     state.woodUpgradeLevel += 1;
-    state.woodUpgradeCost = Math.floor(30 * Math.pow(1.5, state.woodUpgradeLevel));
+    if (!state.freeUpgradesActive) {
+      state.woodUpgradeCost = Math.floor(30 * Math.pow(1.5, state.woodUpgradeLevel));
+    } else {
+      state.woodUpgradeCost = Math.max(1, Math.floor(30 * Math.pow(1.5, state.woodUpgradeLevel) * 0.1));
+    }
     render();
     save();
   }
@@ -204,6 +279,50 @@ buildMineBtn.addEventListener('click', () => {
     render();
     save();
   }
+});
+
+// --- Log Helper ---
+// Displays a timestamped message in the #log div (newest on top)
+function logMessage(msg) {
+  const logEl = document.getElementById('log');
+  const entry = document.createElement('div');
+  entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  logEl.prepend(entry);
+  // Keep only latest 20 log entries
+  while (logEl.children.length > 20) logEl.removeChild(logEl.lastChild);
+}
+
+// --- Special Event: "Show Me The Money" (Windfall) ---
+// Gives 100× the current gold/s as an instant gold bonus.
+// Has a 5-minute cooldown between uses.
+windfallBtn.addEventListener('click', () => {
+  if (state.windfallCooldown > 0) return;
+  const bonus = Math.max(Math.floor(state.goldPerSecond * 100), 50);
+  state.gold += bonus;
+  state.windfallCooldown = 300; // 5-minute cooldown
+  // Flash animation on the gold display
+  goldEl.classList.add('windfall-flash');
+  setTimeout(() => goldEl.classList.remove('windfall-flash'), 1000);
+  logMessage(`💰 WINDFALL! Received +${bonus} gold! (next in 5 min)`);
+  render();
+  save();
+});
+
+// --- Special Event: "Something For Nothing" (Free Upgrades Buff) ---
+// Makes all upgrades 90% cheaper for 60 seconds. 10-minute cooldown after use.
+freeUpgradesBtn.addEventListener('click', () => {
+  if (state.freeUpgradesActive || state.freeUpgradesTimer < 0) return;
+  state.freeUpgradesActive = true;
+  state.freeUpgradesTimer = 60;
+  // Apply 90% discount to all upgrade costs
+  state.goldUpgradeCost = Math.max(1, Math.floor(state.goldUpgradeCost * 0.1));
+  state.diamondsUpgradeCost = Math.max(1, Math.floor(state.diamondsUpgradeCost * 0.1));
+  state.woodUpgradeCost = Math.max(1, Math.floor(state.woodUpgradeCost * 0.1));
+  // Flash animation on upgrades section
+  document.getElementById('upgrades').classList.add('free-upgrades-active');
+  logMessage('🎁 FREE UPGRADES! All costs 90% off for 60 seconds!');
+  render();
+  save();
 });
 
 // --- Init ---
