@@ -9,14 +9,67 @@
 <body>
   <div id="app">
     <h1>Idle Game</h1>
+    
+    <!-- Resources Display -->
     <div id="stats">
-      <p>Coins: <span id="coins">0</span></p>
-      <p>Per second: <span id="per-second">1</span></p>
+      <div class="resource">
+        <span class="resource-icon">🪙</span>
+        <span class="resource-name">Gold:</span>
+        <span id="gold">0</span>
+        <span class="per-sec">(<span id="gold-per-second">1</span>/s)</span>
+      </div>
+      <div class="resource">
+        <span class="resource-icon">💎</span>
+        <span class="resource-name">Diamonds:</span>
+        <span id="diamonds">0</span>
+        <span class="per-sec">(<span id="diamonds-per-second">0</span>/s)</span>
+      </div>
+      <div class="resource">
+        <span class="resource-icon">🪵</span>
+        <span class="resource-name">Wood:</span>
+        <span id="wood">0</span>
+        <span class="per-sec">(<span id="wood-per-second">0</span>/s)</span>
+      </div>
     </div>
-    <div id="actions">
-      <button id="click-btn">Click (+1 coin)</button>
-      <button id="upgrade-btn">Upgrade (cost: <span id="upgrade-cost">10</span>)</button>
+
+    <!-- Click Actions -->
+    <div id="click-actions">
+      <h3>Manual Collection</h3>
+      <button id="click-gold">Mine Gold (+1)</button>
+      <button id="click-diamonds">Mine Diamonds (+1)</button>
+      <button id="click-wood">Chop Wood (+1)</button>
     </div>
+
+    <!-- Upgrades -->
+    <div id="upgrades">
+      <h3>Upgrades</h3>
+      <div class="upgrade-row">
+        <button id="upgrade-gold">
+          Upgrade Gold Mine<br>
+          <small>Cost: <span id="gold-upgrade-cost">10</span> gold</small>
+        </button>
+        <button id="upgrade-diamonds">
+          Upgrade Diamond Mine<br>
+          <small>Cost: <span id="diamonds-upgrade-cost">50</span> gold</small>
+        </button>
+        <button id="upgrade-wood">
+          Upgrade Lumber Mill<br>
+          <small>Cost: <span id="wood-upgrade-cost">30</span> gold</small>
+        </button>
+      </div>
+    </div>
+
+    <!-- Conversion -->
+    <div id="conversion">
+      <h3>Resource Conversion</h3>
+      <button id="convert-diamond">
+        100 Gold → 1 Diamond
+      </button>
+      <button id="convert-wood">
+        50 Gold → 5 Wood
+      </button>
+    </div>
+
     <div id="log"></div>
   </div>
   <script src="game.js"></script>
