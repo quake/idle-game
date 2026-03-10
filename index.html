@@ -9,6 +9,23 @@
 <body>
   <div id="app">
     <h1>Idle Game</h1>
+
+    <!-- Achievements toggle button (top right) -->
+    <div id="achievements-bar">
+      <button id="btn-achievements">🏆 成就</button>
+    </div>
+
+    <!-- Achievements Panel (modal overlay) -->
+    <div id="achievements-panel" class="hidden">
+      <div id="achievements-panel-inner">
+        <div id="achievements-panel-header">
+          <span>🏆 成就系统</span>
+          <button id="achievements-close">✕</button>
+        </div>
+        <div id="achievements-summary"></div>
+        <div id="achievements-list"></div>
+      </div>
+    </div>
     
     <!-- Resources Display -->
     <div id="stats">

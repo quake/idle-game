@@ -48,3 +48,22 @@
 - Each factory produces 20 gold per second (passive income, highest yield building)
 - Factory button uses a cyan-blue color theme to distinguish from other buildings
 - Building a factory logs a message showing total factory production per second
+
+## 2026-03-10
+
+- Added Achievement System with 10 achievements:
+  - "第一桶金" (First Pot of Gold): Earn a cumulative total of 100 gold
+  - "淘金热" (Gold Rush): Earn a cumulative total of 10,000 gold
+  - "百万富翁" (Millionaire): Earn a cumulative total of 1,000,000 gold
+  - "勤劳的矿工" (Diligent Miner): Perform 50 manual clicks
+  - "升级狂人" (Upgrade Addict): Purchase 10 upgrades
+  - "建筑师" (Builder): Own a total of 5 buildings (mines + farms + factories)
+  - "钻石收藏家" (Diamond Collector): Own 10 diamonds at once
+  - "伐木能手" (Lumberjack): Own 100 wood at once
+  - "自动化先锋" (Automation Pioneer): Purchase the auto-clicker
+  - "时来运转" (Lucky Break): Use the "Show Me The Money" windfall event
+- Added 🏆 Achievements panel button (top-right) that opens a modal overlay
+  showing all achievements with unlock status, progress bars, and completion counts
+- Newly unlocked achievements trigger an animated popup notification in the bottom-right corner
+- Tracks cumulative stats: totalGoldEarned, totalClicks, totalUpgrades (persisted in localStorage)
+
