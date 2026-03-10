@@ -114,6 +114,27 @@ h3 {
   background: rgba(128, 208, 128, 0.15);
 }
 
+/* Auto-clicker */
+#auto-clicker-section {
+  margin-bottom: 1.5rem;
+}
+
+#auto-clicker-section button {
+  border-color: #c040f0;
+  color: #c040f0;
+  padding: 0.6rem 1.2rem;
+}
+
+#auto-clicker-section button:hover {
+  background: rgba(192, 64, 240, 0.15);
+}
+
+#auto-clicker-status {
+  margin-top: 0.5rem;
+  color: #80d080;
+  font-size: 0.9rem;
+}
+
 /* General Button Styles */
 button {
   padding: 0.8rem 1.5rem;

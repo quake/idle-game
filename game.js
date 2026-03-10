@@ -17,6 +17,9 @@ const state = {
   goldUpgradeCost: 10,
   diamondsUpgradeCost: 50,
   woodUpgradeCost: 30,
+  // Auto-clicker
+  autoClickerOwned: false,
+  autoClickerCost: 100,
 };
 
 // --- DOM Elements ---
@@ -38,6 +41,8 @@ const upgradeDiamondsBtn = document.getElementById('upgrade-diamonds');
 const upgradeWoodBtn = document.getElementById('upgrade-wood');
 const convertDiamondBtn = document.getElementById('convert-diamond');
 const convertWoodBtn = document.getElementById('convert-wood');
+const autoClickerBtn = document.getElementById('buy-auto-clicker');
+const autoClickerStatusEl = document.getElementById('auto-clicker-status');
 
 // --- Save / Load ---
 function save() {
@@ -72,6 +77,14 @@ function render() {
   upgradeWoodBtn.disabled = state.gold < state.woodUpgradeCost;
   convertDiamondBtn.disabled = state.gold < 100;
   convertWoodBtn.disabled = state.gold < 50;
+  // Auto-clicker button - hide if already owned
+  if (state.autoClickerOwned) {
+    autoClickerBtn.style.display = 'none';
+    autoClickerStatusEl.textContent = '✅ Auto-clicker active (+1 gold/s)';
+  } else {
+    autoClickerBtn.disabled = state.gold < state.autoClickerCost;
+    autoClickerStatusEl.textContent = '';
+  }
 }
 
 // --- Game Loop (1-second tick) ---
@@ -79,6 +92,10 @@ function tick() {
   state.gold += state.goldPerSecond;
   state.diamonds += state.diamondsPerSecond;
   state.wood += state.woodPerSecond;
+  // Auto-clicker: automatically clicks gold once per second
+  if (state.autoClickerOwned) {
+    state.gold += 1;
+  }
   render();
   save();
 }
@@ -150,6 +167,16 @@ convertWoodBtn.addEventListener('click', () => {
   if (state.gold >= 50) {
     state.gold -= 50;
     state.wood += 5;
+    render();
+    save();
+  }
+});
+
+// --- Auto-clicker Handler ---
+autoClickerBtn.addEventListener('click', () => {
+  if (!state.autoClickerOwned && state.gold >= state.autoClickerCost) {
+    state.gold -= state.autoClickerCost;
+    state.autoClickerOwned = true;
     render();
     save();
   }
