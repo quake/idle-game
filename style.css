@@ -148,6 +148,16 @@ h3 {
   background: rgba(128, 200, 64, 0.15);
 }
 
+/* Factory building button — cyan-blue theme */
+#build-factory {
+  border-color: #40b0f0;
+  color: #40b0f0;
+}
+
+#build-factory:hover:not(:disabled) {
+  background: rgba(64, 176, 240, 0.15);
+}
+
 .building-row button small {
   color: #888;
 }

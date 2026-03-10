@@ -41,3 +41,10 @@
 - Each farm produces 5 gold per second (passive income)
 - Farm button uses a distinct green-yellow color theme to distinguish from Gold Mine
 - Building a farm logs a message showing total farm production per second
+
+## 2026-03-10
+
+- Added Factory building: costs 1000 gold initially (each subsequent factory is 50% more expensive)
+- Each factory produces 20 gold per second (passive income, highest yield building)
+- Factory button uses a cyan-blue color theme to distinguish from other buildings
+- Building a factory logs a message showing total factory production per second

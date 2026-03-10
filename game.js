@@ -28,6 +28,10 @@ const state = {
   farmCount: 0,
   farmCost: 200,
   farmProduction: 5, // gold per second per farm
+  // Factory building
+  factoryCount: 0,
+  factoryCost: 1000,
+  factoryProduction: 20, // gold per second per factory
   // Special Events
   windfallCooldown: 0,       // seconds remaining until windfall is available again
   freeUpgradesActive: false, // whether the "something for nothing" buff is active
@@ -61,6 +65,9 @@ const mineCostEl = document.getElementById('mine-cost');
 const buildFarmBtn = document.getElementById('build-farm');
 const farmCountEl = document.getElementById('farm-count');
 const farmCostEl = document.getElementById('farm-cost');
+const buildFactoryBtn = document.getElementById('build-factory');
+const factoryCountEl = document.getElementById('factory-count');
+const factoryCostEl = document.getElementById('factory-cost');
 
 // Special Events
 const windfallBtn = document.getElementById('btn-windfall');
@@ -117,6 +124,10 @@ function render() {
   farmCountEl.textContent = state.farmCount;
   farmCostEl.textContent = state.farmCost;
   buildFarmBtn.disabled = state.gold < state.farmCost;
+  // Factory building
+  factoryCountEl.textContent = state.factoryCount;
+  factoryCostEl.textContent = state.factoryCost;
+  buildFactoryBtn.disabled = state.gold < state.factoryCost;
 
   // Windfall button (5-minute cooldown = 300 seconds)
   if (state.windfallCooldown > 0) {
@@ -159,6 +170,8 @@ function tick() {
   state.gold += state.mineCount * state.mineProduction;
   // Farms produce gold
   state.gold += state.farmCount * state.farmProduction;
+  // Factories produce gold
+  state.gold += state.factoryCount * state.factoryProduction;
 
   // Countdown windfall cooldown
   if (state.windfallCooldown > 0) {
@@ -303,6 +316,20 @@ buildFarmBtn.addEventListener('click', () => {
     // Each subsequent farm is 40% more expensive (rounded)
     state.farmCost = Math.floor(200 * Math.pow(1.4, state.farmCount));
     logMessage(`🌾 Farm #${state.farmCount} built! Total farm production: +${state.farmCount * state.farmProduction} gold/s`);
+    render();
+    save();
+  }
+});
+
+// --- Factory Building Handler ---
+// Factory costs 1000 gold initially; each additional factory costs 50% more than the last.
+buildFactoryBtn.addEventListener('click', () => {
+  if (state.gold >= state.factoryCost) {
+    state.gold -= state.factoryCost;
+    state.factoryCount += 1;
+    // Each subsequent factory is 50% more expensive (rounded)
+    state.factoryCost = Math.floor(1000 * Math.pow(1.5, state.factoryCount));
+    logMessage(`🏭 Factory #${state.factoryCount} built! Total factory production: +${state.factoryCount * state.factoryProduction} gold/s`);
     render();
     save();
   }
