@@ -114,6 +114,34 @@ h3 {
   background: rgba(128, 208, 128, 0.15);
 }
 
+/* Buildings */
+#buildings-section {
+  margin-bottom: 1.5rem;
+}
+
+.building-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.building-row button {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  min-width: 300px;
+  border-color: #f08040;
+  color: #f08040;
+}
+
+.building-row button:hover {
+  background: rgba(240, 128, 64, 0.15);
+}
+
+.building-row button small {
+  color: #888;
+}
+
 /* Auto-clicker */
 #auto-clicker-section {
   margin-bottom: 1.5rem;

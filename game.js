@@ -20,6 +20,10 @@ const state = {
   // Auto-clicker
   autoClickerOwned: false,
   autoClickerCost: 100,
+  // Mine building
+  mineCount: 0,
+  mineCost: 50,
+  mineProduction: 2, // gold per second per mine
 };
 
 // --- DOM Elements ---
@@ -43,6 +47,9 @@ const convertDiamondBtn = document.getElementById('convert-diamond');
 const convertWoodBtn = document.getElementById('convert-wood');
 const autoClickerBtn = document.getElementById('buy-auto-clicker');
 const autoClickerStatusEl = document.getElementById('auto-clicker-status');
+const buildMineBtn = document.getElementById('build-mine');
+const mineCountEl = document.getElementById('mine-count');
+const mineCostEl = document.getElementById('mine-cost');
 
 // --- Save / Load ---
 function save() {
@@ -85,6 +92,10 @@ function render() {
     autoClickerBtn.disabled = state.gold < state.autoClickerCost;
     autoClickerStatusEl.textContent = '';
   }
+  // Mine building
+  mineCountEl.textContent = state.mineCount;
+  mineCostEl.textContent = state.mineCost;
+  buildMineBtn.disabled = state.gold < state.mineCost;
 }
 
 // --- Game Loop (1-second tick) ---
@@ -96,6 +107,8 @@ function tick() {
   if (state.autoClickerOwned) {
     state.gold += 1;
   }
+  // Mines produce gold
+  state.gold += state.mineCount * state.mineProduction;
   render();
   save();
 }
@@ -177,6 +190,17 @@ autoClickerBtn.addEventListener('click', () => {
   if (!state.autoClickerOwned && state.gold >= state.autoClickerCost) {
     state.gold -= state.autoClickerCost;
     state.autoClickerOwned = true;
+    render();
+    save();
+  }
+});
+
+// --- Mine Building Handler ---
+buildMineBtn.addEventListener('click', () => {
+  if (state.gold >= state.mineCost) {
+    state.gold -= state.mineCost;
+    state.mineCount += 1;
+    state.mineCost = Math.floor(50 * Math.pow(1.3, state.mineCount));
     render();
     save();
   }
