@@ -24,6 +24,10 @@ const state = {
   mineCount: 0,
   mineCost: 50,
   mineProduction: 2, // gold per second per mine
+  // Farm building
+  farmCount: 0,
+  farmCost: 200,
+  farmProduction: 5, // gold per second per farm
   // Special Events
   windfallCooldown: 0,       // seconds remaining until windfall is available again
   freeUpgradesActive: false, // whether the "something for nothing" buff is active
@@ -54,6 +58,9 @@ const autoClickerStatusEl = document.getElementById('auto-clicker-status');
 const buildMineBtn = document.getElementById('build-mine');
 const mineCountEl = document.getElementById('mine-count');
 const mineCostEl = document.getElementById('mine-cost');
+const buildFarmBtn = document.getElementById('build-farm');
+const farmCountEl = document.getElementById('farm-count');
+const farmCostEl = document.getElementById('farm-cost');
 
 // Special Events
 const windfallBtn = document.getElementById('btn-windfall');
@@ -106,6 +113,10 @@ function render() {
   mineCountEl.textContent = state.mineCount;
   mineCostEl.textContent = state.mineCost;
   buildMineBtn.disabled = state.gold < state.mineCost;
+  // Farm building
+  farmCountEl.textContent = state.farmCount;
+  farmCostEl.textContent = state.farmCost;
+  buildFarmBtn.disabled = state.gold < state.farmCost;
 
   // Windfall button (5-minute cooldown = 300 seconds)
   if (state.windfallCooldown > 0) {
@@ -146,6 +157,8 @@ function tick() {
   }
   // Mines produce gold
   state.gold += state.mineCount * state.mineProduction;
+  // Farms produce gold
+  state.gold += state.farmCount * state.farmProduction;
 
   // Countdown windfall cooldown
   if (state.windfallCooldown > 0) {
@@ -276,6 +289,20 @@ buildMineBtn.addEventListener('click', () => {
     state.gold -= state.mineCost;
     state.mineCount += 1;
     state.mineCost = Math.floor(50 * Math.pow(1.3, state.mineCount));
+    render();
+    save();
+  }
+});
+
+// --- Farm Building Handler ---
+// Farm costs 200 gold initially; each additional farm costs 40% more than the last.
+buildFarmBtn.addEventListener('click', () => {
+  if (state.gold >= state.farmCost) {
+    state.gold -= state.farmCost;
+    state.farmCount += 1;
+    // Each subsequent farm is 40% more expensive (rounded)
+    state.farmCost = Math.floor(200 * Math.pow(1.4, state.farmCount));
+    logMessage(`🌾 Farm #${state.farmCount} built! Total farm production: +${state.farmCount * state.farmProduction} gold/s`);
     render();
     save();
   }

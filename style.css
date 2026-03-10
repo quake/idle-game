@@ -129,13 +129,23 @@ h3 {
 .building-row button {
   padding: 0.6rem 1rem;
   font-size: 0.85rem;
-  min-width: 300px;
+  min-width: 240px;
   border-color: #f08040;
   color: #f08040;
 }
 
 .building-row button:hover {
   background: rgba(240, 128, 64, 0.15);
+}
+
+/* Farm building button — green-yellow theme */
+#build-farm {
+  border-color: #80c840;
+  color: #80c840;
+}
+
+#build-farm:hover:not(:disabled) {
+  background: rgba(128, 200, 64, 0.15);
 }
 
 .building-row button small {

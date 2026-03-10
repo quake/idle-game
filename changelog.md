@@ -34,3 +34,10 @@
     all upgrades 90% cheaper. Has a 10-minute cooldown after use.
     Upgrades section glows green while buff is active.
 - Added event log panel (shows last 20 events with timestamps)
+
+## 2026-03-10
+
+- Added Farm building: costs 200 gold initially (each subsequent farm is 40% more expensive)
+- Each farm produces 5 gold per second (passive income)
+- Farm button uses a distinct green-yellow color theme to distinguish from Gold Mine
+- Building a farm logs a message showing total farm production per second
