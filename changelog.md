@@ -67,3 +67,14 @@
 - Newly unlocked achievements trigger an animated popup notification in the bottom-right corner
 - Tracks cumulative stats: totalGoldEarned, totalClicks, totalUpgrades (persisted in localStorage)
 
+## 2026-03-10
+
+- Added Tech Tree panel (🔬 科技树) with one initial research technology: "效率提升" (Efficiency Boost)
+  - "效率提升" increases all building (Mine, Farm, Factory) production by +50% per level
+  - Max 3 levels; level 1 costs 500 gold, level 2 costs 1,500 gold, level 3 costs 4,500 gold
+  - Research button is accessible via the new 🔬 科技树 button (top-right bar beside Achievements)
+  - Panel opens as a modal overlay with tech card showing current level, effect, cost for next level, and filled dot indicators
+  - Building production labels on buttons update in real time to reflect the active efficiency multiplier
+  - Efficiency multiplier is applied to building production in the game tick (floor-based)
+  - All tech tree state persisted in localStorage under the existing save key
+

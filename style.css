@@ -493,3 +493,188 @@ button:disabled {
   font-size: 0.78rem;
   color: #aaa;
 }
+
+/* ===== Tech Tree Button (in achievements bar) ===== */
+#btn-tech-tree {
+  border-color: #40e0d0;
+  color: #40e0d0;
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+#btn-tech-tree:hover {
+  background: rgba(64, 224, 208, 0.15);
+  box-shadow: 0 0 10px #40e0d088;
+}
+
+/* ===== Tech Tree Panel (modal overlay) ===== */
+#tech-tree-panel {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#tech-tree-panel.hidden {
+  display: none;
+}
+
+#tech-tree-panel-inner {
+  background: #16213e;
+  border: 2px solid #40e0d0;
+  border-radius: 12px;
+  width: min(580px, 95vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#tech-tree-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #333;
+  font-size: 1.1rem;
+  color: #40e0d0;
+  font-weight: bold;
+}
+
+#tech-tree-close {
+  border: none;
+  background: transparent;
+  color: #888;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+}
+
+#tech-tree-close:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  transform: none;
+}
+
+#tech-tree-summary {
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  color: #40e0d0;
+  border-bottom: 1px solid #222;
+}
+
+#tech-tree-list {
+  overflow-y: auto;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* ===== Individual Tech Card ===== */
+.tech-card {
+  background: rgba(64, 224, 208, 0.05);
+  border: 1px solid #40e0d044;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+}
+
+.tech-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.tech-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.tech-info {
+  flex: 1;
+  text-align: left;
+}
+
+.tech-name {
+  font-size: 1rem;
+  color: #40e0d0;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.tech-level {
+  font-size: 0.8rem;
+  color: #888;
+  margin-left: 0.4rem;
+  font-weight: normal;
+}
+
+.tech-desc {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-bottom: 0.3rem;
+}
+
+.tech-effect {
+  font-size: 0.82rem;
+  color: #888;
+}
+
+.tech-effect.tech-effect-active {
+  color: #80ff80;
+  font-weight: bold;
+}
+
+.tech-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Research button inside tech card */
+.tech-research-btn {
+  border-color: #40e0d0;
+  color: #40e0d0;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+  min-width: 0;
+}
+
+.tech-research-btn:hover:not(:disabled) {
+  background: rgba(64, 224, 208, 0.18);
+  box-shadow: 0 0 10px #40e0d066;
+}
+
+.tech-maxed {
+  font-size: 0.9rem;
+  color: #80ff80;
+}
+
+/* Level dots indicator */
+.tech-level-dots {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.tech-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #40e0d0;
+  background: transparent;
+}
+
+.tech-dot.tech-dot-filled {
+  background: #40e0d0;
+  box-shadow: 0 0 6px #40e0d0;
+}

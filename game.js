@@ -42,6 +42,10 @@ const state = {
   totalGoldEarned: 0,        // all-time gold earned (never decreases)
   totalClicks: 0,            // total manual clicks across all resources
   totalUpgrades: 0,          // total upgrades purchased
+  // Tech Tree — research levels for each technology
+  // efficiencyLevel: level of "效率提升" research (0 = not researched)
+  // Each level grants +50% to all building production, max 3 levels
+  efficiencyLevel: 0,
 };
 
 // --- Achievement Definitions ---
@@ -194,6 +198,107 @@ function renderAchievementsPanel() {
   }
 }
 
+// --- Tech Tree Definitions ---
+// TECH_TREE: array of research tech objects
+// Each tech: { id, name, desc, icon, maxLevel, baseCost, costMultiplier }
+// baseCost is the gold cost for level 1; each subsequent level costs more.
+const TECH_TREE = [
+  {
+    id: 'efficiency',
+    name: '效率提升',
+    desc: '所有建筑（矿场/农场/工厂）产出永久+50%（每级叠加，最多3级）',
+    icon: '⚙️',
+    maxLevel: 3,
+    baseCost: 500,         // level 1 costs 500 gold
+    costMultiplier: 3,     // level n costs baseCost * costMultiplier^(n-1)
+    // Returns the gold cost for the NEXT level given current level
+    nextCost(currentLevel) {
+      return Math.floor(this.baseCost * Math.pow(this.costMultiplier, currentLevel));
+    },
+    // Returns the effect description for the current level
+    effectDesc(level) {
+      if (level === 0) return '未研究';
+      return `+${level * 50}% 建筑产出（当前生效）`;
+    },
+  },
+];
+
+// Get the efficiency multiplier for building production (1.0 = no bonus)
+function getBuildingEfficiencyMultiplier() {
+  return 1 + state.efficiencyLevel * 0.5;
+}
+
+// Render the tech tree panel content
+function renderTechTree() {
+  const container = document.getElementById('tech-tree-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  TECH_TREE.forEach(tech => {
+    const stateKey = tech.id + 'Level'; // e.g. 'efficiencyLevel'
+    const currentLevel = state[stateKey] || 0;
+    const maxed = currentLevel >= tech.maxLevel;
+    const nextCost = maxed ? null : tech.nextCost(currentLevel);
+    const canAfford = !maxed && state.gold >= nextCost;
+
+    const card = document.createElement('div');
+    card.className = 'tech-card';
+    card.innerHTML = `
+      <div class="tech-card-header">
+        <span class="tech-icon">${tech.icon}</span>
+        <div class="tech-info">
+          <div class="tech-name">${tech.name}
+            <span class="tech-level">${currentLevel}/${tech.maxLevel}</span>
+          </div>
+          <div class="tech-desc">${tech.desc}</div>
+          <div class="tech-effect ${currentLevel > 0 ? 'tech-effect-active' : ''}">${tech.effectDesc(currentLevel)}</div>
+        </div>
+      </div>
+      <div class="tech-card-footer">
+        ${maxed
+          ? '<span class="tech-maxed">✅ 已满级</span>'
+          : `<button class="tech-research-btn" data-tech-id="${tech.id}" ${canAfford ? '' : 'disabled'}>
+               🔬 研究 (${nextCost} 金币)
+             </button>`
+        }
+        <div class="tech-level-dots">
+          ${Array.from({length: tech.maxLevel}, (_, i) =>
+            `<span class="tech-dot ${i < currentLevel ? 'tech-dot-filled' : ''}"></span>`
+          ).join('')}
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // Bind research button click events
+  container.querySelectorAll('.tech-research-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const techId = btn.getAttribute('data-tech-id');
+      researchTech(techId);
+    });
+  });
+}
+
+// Research a technology by id — deducts gold and increments level
+function researchTech(techId) {
+  const tech = TECH_TREE.find(t => t.id === techId);
+  if (!tech) return;
+  const stateKey = techId + 'Level';
+  const currentLevel = state[stateKey] || 0;
+  if (currentLevel >= tech.maxLevel) return;
+  const cost = tech.nextCost(currentLevel);
+  if (state.gold < cost) return;
+
+  state.gold -= cost;
+  state[stateKey] = currentLevel + 1;
+
+  logMessage(`🔬 科技研究完成：${tech.icon} ${tech.name} 升至 Lv${state[stateKey]}（${tech.effectDesc(state[stateKey])}）`);
+  renderTechTree();
+  render();
+  save();
+}
+
 // --- DOM Elements ---
 const goldEl = document.getElementById('gold');
 const diamondsEl = document.getElementById('diamonds');
@@ -284,6 +389,14 @@ function render() {
   factoryCountEl.textContent = state.factoryCount;
   factoryCostEl.textContent = state.factoryCost;
   buildFactoryBtn.disabled = state.gold < state.factoryCost;
+  // Update building production labels to reflect efficiency multiplier
+  const effMult = getBuildingEfficiencyMultiplier();
+  const mineProdEl = document.getElementById('mine-prod');
+  const farmProdEl = document.getElementById('farm-prod');
+  const factoryProdEl = document.getElementById('factory-prod');
+  if (mineProdEl) mineProdEl.textContent = (state.mineProduction * effMult).toFixed(effMult % 1 === 0 ? 0 : 1);
+  if (farmProdEl) farmProdEl.textContent = (state.farmProduction * effMult).toFixed(effMult % 1 === 0 ? 0 : 1);
+  if (factoryProdEl) factoryProdEl.textContent = (state.factoryProduction * effMult).toFixed(effMult % 1 === 0 ? 0 : 1);
 
   // Windfall button (5-minute cooldown = 300 seconds)
   if (state.windfallCooldown > 0) {
@@ -326,16 +439,17 @@ function tick() {
     state.gold += 1;
     goldThisTick += 1;
   }
-  // Mines produce gold
-  const mineGold = state.mineCount * state.mineProduction;
+  // Mines produce gold (with efficiency multiplier from tech tree)
+  const effMult = getBuildingEfficiencyMultiplier();
+  const mineGold = Math.floor(state.mineCount * state.mineProduction * effMult);
   state.gold += mineGold;
   goldThisTick += mineGold;
-  // Farms produce gold
-  const farmGold = state.farmCount * state.farmProduction;
+  // Farms produce gold (with efficiency multiplier from tech tree)
+  const farmGold = Math.floor(state.farmCount * state.farmProduction * effMult);
   state.gold += farmGold;
   goldThisTick += farmGold;
-  // Factories produce gold
-  const factoryGold = state.factoryCount * state.factoryProduction;
+  // Factories produce gold (with efficiency multiplier from tech tree)
+  const factoryGold = Math.floor(state.factoryCount * state.factoryProduction * effMult);
   state.gold += factoryGold;
   goldThisTick += factoryGold;
 
@@ -592,5 +706,25 @@ if (achBtn) {
 if (achCloseBtn) {
   achCloseBtn.addEventListener('click', () => {
     achPanel.classList.add('hidden');
+  });
+}
+
+// --- Tech Tree Panel Toggle ---
+const techBtn = document.getElementById('btn-tech-tree');
+const techPanel = document.getElementById('tech-tree-panel');
+const techCloseBtn = document.getElementById('tech-tree-close');
+
+if (techBtn) {
+  techBtn.addEventListener('click', () => {
+    techPanel.classList.toggle('hidden');
+    if (!techPanel.classList.contains('hidden')) {
+      renderTechTree();
+    }
+  });
+}
+
+if (techCloseBtn) {
+  techCloseBtn.addEventListener('click', () => {
+    techPanel.classList.add('hidden');
   });
 }

@@ -13,6 +13,7 @@
     <!-- Achievements toggle button (top right) -->
     <div id="achievements-bar">
       <button id="btn-achievements">🏆 成就</button>
+      <button id="btn-tech-tree">🔬 科技树</button>
     </div>
 
     <!-- Achievements Panel (modal overlay) -->
@@ -24,6 +25,18 @@
         </div>
         <div id="achievements-summary"></div>
         <div id="achievements-list"></div>
+      </div>
+    </div>
+
+    <!-- Tech Tree Panel (modal overlay) -->
+    <div id="tech-tree-panel" class="hidden">
+      <div id="tech-tree-panel-inner">
+        <div id="tech-tree-panel-header">
+          <span>🔬 科技树</span>
+          <button id="tech-tree-close">✕</button>
+        </div>
+        <div id="tech-tree-summary">研究科技以永久提升生产效率！</div>
+        <div id="tech-tree-list"></div>
       </div>
     </div>
     
@@ -81,17 +94,17 @@
       <h3>Buildings</h3>
       <div class="building-row">
         <button id="build-mine">
-          ⛏️ Build Gold Mine<br>
-          <small>Cost: <span id="mine-cost">50</span> gold | Owned: <span id="mine-count">0</span> | +2 gold/s each</small>
-        </button>
-        <button id="build-farm">
-          🌾 Build Farm<br>
-          <small>Cost: <span id="farm-cost">200</span> gold | Owned: <span id="farm-count">0</span> | +5 gold/s each</small>
-        </button>
-        <button id="build-factory">
-          🏭 Build Factory<br>
-          <small>Cost: <span id="factory-cost">1000</span> gold | Owned: <span id="factory-count">0</span> | +20 gold/s each</small>
-        </button>
+            ⛏️ Build Gold Mine<br>
+            <small>Cost: <span id="mine-cost">50</span> gold | Owned: <span id="mine-count">0</span> | +<span id="mine-prod">2</span> gold/s each</small>
+          </button>
+          <button id="build-farm">
+            🌾 Build Farm<br>
+            <small>Cost: <span id="farm-cost">200</span> gold | Owned: <span id="farm-count">0</span> | +<span id="farm-prod">5</span> gold/s each</small>
+          </button>
+          <button id="build-factory">
+            🏭 Build Factory<br>
+            <small>Cost: <span id="factory-cost">1000</span> gold | Owned: <span id="factory-count">0</span> | +<span id="factory-prod">20</span> gold/s each</small>
+          </button>
       </div>
     </div>
 
