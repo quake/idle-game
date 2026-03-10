@@ -1,0 +1,53 @@
+/* Dark theme idle game styles */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: monospace;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+#app {
+  text-align: center;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #f0c040;
+}
+
+#stats { margin-bottom: 1.5rem; font-size: 1.2rem; }
+#stats p { margin: 0.3rem 0; }
+#coins { color: #f0c040; font-weight: bold; }
+#per-second { color: #80d080; }
+
+#actions { display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem; }
+
+button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-family: monospace;
+  border: 2px solid #f0c040;
+  background: transparent;
+  color: #f0c040;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+button:hover { background: rgba(240, 192, 64, 0.15); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+#log {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #888;
+  max-height: 200px;
+  overflow-y: auto;
+}
